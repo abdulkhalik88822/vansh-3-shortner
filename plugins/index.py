@@ -27,12 +27,17 @@ async def index_files(bot, query):
 async def send_for_index(bot, message):
     if lock.locked():
         return await message.reply('Wait until the previous process completes.')
-    
+
     i = await message.reply("Forward the last message or send the last message link.")
-    
-    # Use bot.wait_for() instead of wait_for_message
+
     try:
-        msg = await bot.wait_for(filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
+        # Use asyncio.wait_for with timeout
+        msg = await asyncio.wait_for(
+            bot.get_chat_updates(filters.text & filters.incoming & filters.user(message.from_user.id)),
+            timeout=60
+        )
+        # Access the first message from the update object
+        msg = msg.message
     except asyncio.TimeoutError:
         return await message.reply("You took too long to respond!")
 
