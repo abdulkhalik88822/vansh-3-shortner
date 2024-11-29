@@ -172,8 +172,11 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
                     continue
                 media.file_type = message.media.value
                 media.caption = message.caption
-                aynav, vnay = await save_file(media)
-                if aynav:
+                result = await save_file(media)
+                aynac = result[0]  # Unpack the first value
+                vnay = result[1]   # Unpack the second value
+                # Optionally, unpack other values if needed
+                if aynac:
                     total_files += 1
                 elif vnay == 0:
                     duplicate += 1
@@ -184,3 +187,4 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
             await msg.edit(f'Error: {e}')
         else:
             await msg.edit(f'Succesfully saved <code>{total_files}</code> to dataBase!\nDuplicate Files Skipped: <code>{duplicate}</code>\nDeleted Messages Skipped: <code>{deleted}</code>\nNon-Media messages skipped: <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\nErrors Occurred: <code>{errors}</code>')
+
