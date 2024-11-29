@@ -23,20 +23,32 @@ async def index_files(bot, query):
         temp.CANCEL = True
         await query.message.edit("Trying to cancel Indexing...")
 
+
 @Client.on_message(filters.command('index') & filters.private & filters.incoming & filters.user(ADMINS))
 async def send_for_index(bot, message):
     if lock.locked():
-        return await message.reply('Wait until previous process complete.')
-    i = await message.reply("Forward last message or send last message link.")
-    msg = await bot.listen(chat_id=message.chat.id, user_id=message.from_user.id)
+        return await message.reply('Wait until the previous process completes.')
+    
+    i = await message.reply("Forward the last message or send the last message link.")
+    
+    # Wait for the user's next message
+    def check(m):
+        return m.chat.id == message.chat.id and m.from_user.id == message.from_user.id
+
+    try:
+        msg = await bot.listen(chat_id=message.chat.id, filters=filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
+    except asyncio.TimeoutError:
+        return await message.reply("You took too long to respond!")
+
     await i.delete()
+
     if msg.text and msg.text.startswith("https://t.me"):
         try:
             msg_link = msg.text.split("/")
             last_msg_id = int(msg_link[-1])
             chat_id = msg_link[-2]
             if chat_id.isnumeric():
-                chat_id = int(("-100" + chat_id))
+                chat_id = int("-100" + chat_id)
         except:
             await message.reply('Invalid message link!')
             return
@@ -44,28 +56,43 @@ async def send_for_index(bot, message):
         last_msg_id = msg.forward_from_message_id
         chat_id = msg.forward_from_chat.username or msg.forward_from_chat.id
     else:
-        await message.reply('This is not forwarded message or link.')
+        await message.reply('This is not a forwarded message or a valid link.')
         return
+    
     try:
         chat = await bot.get_chat(chat_id)
     except Exception as e:
-        return await message.reply(f'Errors - {e}')
+        return await message.reply(f'Error: {e}')
+    
     if chat.type != enums.ChatType.CHANNEL:
-        return await message.reply("I can index only channels.")
+        return await message.reply("I can only index channels.")
+    
     s = await message.reply("Send skip message number.")
-    msg = await bot.listen(chat_id=message.chat.id, user_id=message.from_user.id)
+    
+    try:
+        msg = await bot.listen(chat_id=message.chat.id, filters=filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
+    except asyncio.TimeoutError:
+        return await message.reply("You took too long to respond!")
+
     await s.delete()
+
     try:
         skip = int(msg.text)
     except:
-        return await message.reply("Number is invalid.")
-    buttons = [[
-        InlineKeyboardButton('YES', callback_data=f'index#yes#{chat_id}#{last_msg_id}#{skip}')
-    ],[
-        InlineKeyboardButton('CLOSE', callback_data='close_data'),
-    ]]
+        return await message.reply("Invalid number.")
+    
+    buttons = [
+        [
+            InlineKeyboardButton('YES', callback_data=f'index#yes#{chat_id}#{last_msg_id}#{skip}')
+        ],
+        [
+            InlineKeyboardButton('CLOSE', callback_data='close_data'),
+        ]
+    ]
     reply_markup = InlineKeyboardMarkup(buttons)
-    await message.reply(f'Do you want to index {chat.title} channel?\nTotal Messages: <code>{last_msg_id}</code>', reply_markup=reply_markup)
+    await message.reply(f'Do you want to index the channel "{chat.title}"?\nTotal Messages: <code>{last_msg_id}</code>', reply_markup=reply_markup)
+
+
 
 @Client.on_message(filters.command('channel'))
 async def channel_info(bot, message):
