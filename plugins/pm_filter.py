@@ -27,7 +27,7 @@ async def pm_search(client, message):
     if PM_SEARCH:
         await auto_filter(client, message)  
     else:
-        await message.reply_text("⚠️ ꜱᴏʀʀʏ ɪ ᴄᴀɴ'ᴛ ᴡᴏʀᴋ ɪɴ ᴘᴍ")
+        await message.reply_text("⚠️ 𝚂𝚘𝚛𝚛𝚢 𝙸 𝙲𝚊𝚗𝚃 𝚆𝚘𝚛𝚔 𝙸𝚗 𝙿𝙼 | 𝙼𝚘𝚟𝚒𝚎 𝙶𝚛𝚘𝚞𝚙 𝙸𝚜 @movie_hub_094")
     
 @Client.on_message(filters.group & filters.text & filters.incoming)
 async def group_search(client, message):
