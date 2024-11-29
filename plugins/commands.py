@@ -86,6 +86,9 @@ async def start(client:Client, message):
             reply_markup=reply_markup,
             parse_mode=enums.ParseMode.HTML
         )
+
+        await message.reply_text("<b>𝙼𝚘𝚟𝚒𝚎 𝚂𝚒𝚝𝚎: cinema4u.xyz - 𝙰𝚕𝚕 𝚝𝚢𝚙𝚎𝚜 𝚘𝚏 𝚖𝚘𝚟𝚒𝚎𝚜 𝚊𝚟𝚊𝚒𝚕𝚊𝚋𝚕𝚎!</b>", parse_mode=enums.ParseMode.HTML)
+        
         return
 
     if len(message.command) == 2 and message.command[1] in ["subscribe", "error", "okay", "help", "buy_premium"]:
@@ -115,6 +118,9 @@ async def start(client:Client, message):
             reply_markup=reply_markup,
             parse_mode=enums.ParseMode.HTML
         )
+
+        await message.reply_text("<b>𝙼𝚘𝚟𝚒𝚎 𝚂𝚒𝚝𝚎: cinema4u.xyz - 𝙰𝚕𝚕 𝚝𝚢𝚙𝚎𝚜 𝚘𝚏 𝚖𝚘𝚟𝚒𝚎𝚜 𝚊𝚟𝚊𝚒𝚕𝚊𝚋𝚕𝚎!</b>", parse_mode=enums.ParseMode.HTML)
+        
         return
 
     data = message.command[1]
@@ -139,6 +145,8 @@ async def start(client:Client, message):
             reply_markup=InlineKeyboardMarkup(btn),
             parse_mode=enums.ParseMode.HTML
         )
+        await message.reply_text("<b>𝙼𝚘𝚟𝚒𝚎 𝚂𝚒𝚝𝚎: cinema4u.xyz - 𝙰𝚕𝚕 𝚝𝚢𝚙𝚎𝚜 𝚘𝚏 𝚖𝚘𝚟𝚒𝚎𝚜 𝚊𝚟𝚊𝚒𝚕𝚊𝚋𝚕𝚎!</b>", parse_mode=enums.ParseMode.HTML)
+        
         return
             
     user_id = m.from_user.id
