@@ -30,9 +30,9 @@ async def send_for_index(bot, message):
     
     i = await message.reply("Forward the last message or send the last message link.")
     
-    # Use bot.listen instead of wait_for_message
+    # Use bot.wait_for() instead of wait_for_message
     try:
-        msg = await bot.listen(message.chat.id, filters=filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
+        msg = await bot.wait_for(filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
     except asyncio.TimeoutError:
         return await message.reply("You took too long to respond!")
 
@@ -66,7 +66,7 @@ async def send_for_index(bot, message):
     s = await message.reply("Send skip message number.")
     
     try:
-        msg = await bot.listen(message.chat.id, filters=filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
+        msg = await bot.wait_for(filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
     except asyncio.TimeoutError:
         return await message.reply("You took too long to respond!")
 
@@ -87,6 +87,7 @@ async def send_for_index(bot, message):
     ]
     reply_markup = InlineKeyboardMarkup(buttons)
     await message.reply(f'Do you want to index the channel "{chat.title}"?\nTotal Messages: <code>{last_msg_id}</code>', reply_markup=reply_markup)
+
 
 async def index_files_to_db(lst_msg_id, chat, msg, bot, skip):
     start_time = time.time()
