@@ -1,10 +1,10 @@
-import asyncio
 from pyrogram import Client, filters, enums
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+import time
+import asyncio
 from info import ADMINS, CHANNELS
 from database.ia_filterdb import save_file
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from utils import temp, get_readable_time
-import time
 
 lock = asyncio.Lock()
 
@@ -23,7 +23,6 @@ async def index_files(bot, query):
         temp.CANCEL = True
         await query.message.edit("Trying to cancel Indexing...")
 
-
 @Client.on_message(filters.command('index') & filters.private & filters.incoming & filters.user(ADMINS))
 async def send_for_index(bot, message):
     if lock.locked():
@@ -31,7 +30,6 @@ async def send_for_index(bot, message):
     
     i = await message.reply("Forward the last message or send the last message link.")
     
-    # Wait for the user's next message using wait_for_message
     try:
         msg = await bot.wait_for_message(chat_id=message.chat.id, filters=filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
     except asyncio.TimeoutError:
@@ -89,23 +87,6 @@ async def send_for_index(bot, message):
     reply_markup = InlineKeyboardMarkup(buttons)
     await message.reply(f'Do you want to index the channel "{chat.title}"?\nTotal Messages: <code>{last_msg_id}</code>', reply_markup=reply_markup)
 
-
-
-@Client.on_message(filters.command('channel'))
-async def channel_info(bot, message):
-    if message.from_user.id not in ADMINS:
-        await message.reply('ᴏɴʟʏ ᴛʜᴇ ʙᴏᴛ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ... 😑')
-        return
-    ids = CHANNELS
-    if not ids:
-        return await message.reply("Not set CHANNELS")
-    text = '**Indexed Channels:**\n\n'
-    for id in ids:
-        chat = await bot.get_chat(id)
-        text += f'{chat.title}\n'
-    text += f'\n**Total:** {len(ids)}'
-    await message.reply(text)
-
 async def index_files_to_db(lst_msg_id, chat, msg, bot, skip):
     start_time = time.time()
     total_files = 0
@@ -158,4 +139,4 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot, skip):
             await msg.reply(f'Index canceled due to Error - {e}')
         else:
             time_taken = get_readable_time(time.time()-start_time)
-            await msg.edit(f'Succesfully saved <code>{total_files}</code> to Database!\nCompleted in {time_taken}\n\nDuplicate Files Skipped: <code>{duplicate}</code>\nDeleted Messages Skipped: <code>{deleted}</code>\nNon-Media messages skipped: <code>{no_media + unsupported}</code>\nUnsupported Media: <code>{unsupported}</code>\nErrors Occurred: <code>{errors}</code>')
+            await msg.edit(f'Successfully saved <code>{total_files}</code> to Database!\nCompleted in {time_taken}\n\nDuplicate Files Skipped: <code>{duplicate}</code>\nDeleted Messages Skipped: <code>{deleted}</code>\nNon-Media messages skipped: <code>{no_media + unsupported}</code>\nUnsupported Media: <code>{unsupported}</code>\nErrors Occurred: <code>{errors}</code>')
