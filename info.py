@@ -34,8 +34,8 @@ QR_CODE = environ.get('QR_CODE', 'https://envs.sh/YdS.jpg')
 DELETE_CHANNELS = [int(dch) if id_pattern.search(dch) else dch for dch in environ.get('DELETE_CHANNELS', '0').split()]
 
 #this vars is for when heroku or koyeb acc get banned, then change this vars as your file to link bot name
-BIN_CHANNEL = int(environ.get('BIN_CHANNEL', ''))
-URL = environ.get('URL', '')
+BIN_CHANNEL = int(environ.get('BIN_CHANNEL', '-1001834715749'))
+URL = environ.get('URL', 'https://166.0.242.207:12731/')
 
 # verify system vars
 IS_VERIFY = is_enabled('IS_VERIFY', True)
@@ -46,19 +46,19 @@ TUTORIAL3 = environ.get("TUTORIAL3", "https://www.youtube.com/watch?v=iIzKydeJ9B
 VERIFY_IMG = environ.get("VERIFY_IMG", "https://img.freepik.com/premium-vector/verified-banner-icon-flat-style-verify-label-vector-illustration-isolated-background-accepted-sign-business-concept_157943-29367.jpg")
 SHORTENER_API = environ.get("SHORTENER_API", "9194ef84c5f3a615b4953c80909583eb114f8780")
 SHORTENER_WEBSITE = environ.get("SHORTENER_WEBSITE", "gplinks.com")
-SHORTENER_API2 = environ.get("SHORTENER_API2", "")
-SHORTENER_WEBSITE2 = environ.get("SHORTENER_WEBSITE2", "")
-SHORTENER_API3 = environ.get("SHORTENER_API3", "")
-SHORTENER_WEBSITE3 = environ.get("SHORTENER_WEBSITE3", "")
+SHORTENER_API2 = environ.get("SHORTENER_API2", "9194ef84c5f3a615b4953c80909583eb114f8780")
+SHORTENER_WEBSITE2 = environ.get("SHORTENER_WEBSITE2", "gplinks.com")
+SHORTENER_API3 = environ.get("SHORTENER_API3", "9194ef84c5f3a615b4953c80909583eb114f8780")
+SHORTENER_WEBSITE3 = environ.get("SHORTENER_WEBSITE3", "gplinks.com")
 TWO_VERIFY_GAP = int(environ.get('TWO_VERIFY_GAP', "3600"))
 THREE_VERIFY_GAP = int(environ.get('THREE_VERIFY_GAP', "21600"))
 
 # languages search
 LANGUAGES = ["hindi", "english", "telugu", "tamil", "kannada", "malayalam"]
 
-auth_channel = environ.get('AUTH_CHANNEL', '')
+auth_channel = environ.get('AUTH_CHANNEL', '-1002076903232')
 AUTH_CHANNEL = int(auth_channel) if auth_channel and id_pattern.search(auth_channel) else None
-SUPPORT_GROUP = int(environ.get('SUPPORT_GROUP', ''))
+SUPPORT_GROUP = int(environ.get('SUPPORT_GROUP', '-1002126180963'))
 
 # bot settings
 AUTO_FILTER = is_enabled('AUTO_FILTER', True)
