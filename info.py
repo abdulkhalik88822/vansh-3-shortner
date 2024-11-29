@@ -23,7 +23,7 @@ API_HASH = environ.get('API_HASH', '812529f879f06436925c7d62eb49f5d1')
 BOT_TOKEN = environ.get('BOT_TOKEN', '7838774133:AAEINIrFIEeQtYHTXiGvTZJ-PNgLGgLN74Q')
 ADMINS = [int(admin) if id_pattern.search(admin) else admin for admin in environ.get('ADMINS', '2020224264').split()]
 USERNAME = environ.get('USERNAME', 'https://telegram.me/none_090')
-LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1002076903232'))
+LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1002065793080'))
 CHANNELS = [int(ch) if id_pattern.search(ch) else ch for ch in environ.get('CHANNELS', '-1002076903232').split()]
 DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://vansh020:vansh020@storefile.mqprfjm.mongodb.net/?retryWrites=true&w=majority&appName=Storefile&ssl=true")
 DATABASE_URI2 = environ.get('DATABASE_URI2', "mongodb+srv://vansh020:vansh020@storefile.mqprfjm.mongodb.net/?retryWrites=true&w=majority&appName=Storefile&ssl=true")
