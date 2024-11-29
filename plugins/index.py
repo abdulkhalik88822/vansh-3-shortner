@@ -8,6 +8,8 @@ from utils import temp, get_readable_time
 
 lock = asyncio.Lock()
 
+user_responses = {}
+
 @Client.on_callback_query(filters.regex(r'^index'))
 async def index_files(bot, query):
     _, ident, chat, lst_msg_id, skip = query.data.split("#")
@@ -31,14 +33,24 @@ async def send_for_index(client, message):
     i = await message.reply("Forward the last message or send the last message link.")
 
     try:
-        # Use client.wait_for() instead of bot.wait_for()
-        msg = await client.wait_for(filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
+        # Use client.listen() instead of client.wait_for()
+        await message.reply("Please reply with a message link or forwarded message.")
+        user_responses[message.from_user.id] = None  # Initialize user response tracker
+
+        # Wait for the reply from the same user
+        msg = await client.listen(message.chat.id, filters=filters.text & filters.user(message.from_user.id), timeout=60)
+        
+        # Store the response
+        user_responses[message.from_user.id] = msg
+
     except asyncio.TimeoutError:
         return await message.reply("You took too long to respond!")
 
     await i.delete()
 
-    if msg.text and msg.text.startswith("https://t.me"):
+    msg = user_responses.get(message.from_user.id)
+
+    if msg and msg.text and msg.text.startswith("https://t.me"):
         try:
             msg_link = msg.text.split("/")
             last_msg_id = int(msg_link[-1])
@@ -48,7 +60,7 @@ async def send_for_index(client, message):
         except:
             await message.reply('Invalid message link!')
             return
-    elif msg.forward_from_chat and msg.forward_from_chat.type == enums.ChatType.CHANNEL:
+    elif msg and msg.forward_from_chat and msg.forward_from_chat.type == enums.ChatType.CHANNEL:
         last_msg_id = msg.forward_from_message_id
         chat_id = msg.forward_from_chat.username or msg.forward_from_chat.id
     else:
@@ -66,7 +78,7 @@ async def send_for_index(client, message):
     s = await message.reply("Send skip message number.")
     
     try:
-        msg = await client.wait_for(filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
+        msg = await client.listen(message.chat.id, filters=filters.text & filters.user(message.from_user.id), timeout=60)
     except asyncio.TimeoutError:
         return await message.reply("You took too long to respond!")
 
@@ -87,9 +99,6 @@ async def send_for_index(client, message):
     ]
     reply_markup = InlineKeyboardMarkup(buttons)
     await message.reply(f'Do you want to index the channel "{chat.title}"?\nTotal Messages: <code>{last_msg_id}</code>', reply_markup=reply_markup)
-
-
-
 
 async def index_files_to_db(lst_msg_id, chat, msg, bot, skip):
     start_time = time.time()
@@ -114,7 +123,7 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot, skip):
                     btn = [[
                         InlineKeyboardButton('CANCEL', callback_data=f'index#cancel#{chat}#{lst_msg_id}#{skip}')
                     ]]
-                    await msg.edit_text(text=f"Total messages received: <code>{current}</code>\nTotal messages saved: <code>{total_files}</code>\nDuplicate Files Skipped: <code>{duplicate}</code>\nDeleted Messages Skipped: <code>{deleted}</code>\nNon-Media messages skipped: <code>{no_media + unsupported}</code>\nUnsupported Media: <code>{unsupported}</code>\nErrors Occurred: <code>{errors}</code>", reply_markup=InlineKeyboardMarkup(btn))
+                    await msg.edit_text(text=f"Total messages received: <code>{current}</code>\nTotal messages saved: <code>{total_files}</code>\nDuplicate Files Skipped: <code>{duplicate}</code>\nDeleted Messages Skipped: <code>{deleted}</code>\nNon-Media messages skipped: <code>{no_media + unsupported}</code>\nUnsupported Media: <code>{unsupported}</code>\nErrors Occurred: <code>{errors}</code}", reply_markup=InlineKeyboardMarkup(btn))
                 if message.empty:
                     deleted += 1
                     continue
