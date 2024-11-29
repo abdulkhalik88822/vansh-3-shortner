@@ -27,7 +27,7 @@ LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1002076903232'))
 CHANNELS = [int(ch) if id_pattern.search(ch) else ch for ch in environ.get('CHANNELS', '-1002076903232').split()]
 DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://vanshearning15:mHjcf0OaPZHpXbr7@cluster0.smwx5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 DATABASE_URI2 = environ.get('DATABASE_URI2', "mongodb+srv://vansh_090:vansh_090@storefile.mqprfjm.mongodb.net/?retryWrites=true&w=majority&appName=Storefile")
-DATABASE_NAME = environ.get('DATABASE_NAME', "vansh")
+DATABASE_NAME = environ.get('DATABASE_NAME', "cluster0")
 COLLECTION_NAME = environ.get('COLLECTION_NAME', 'vansh')
 LOG_API_CHANNEL = int(environ.get('LOG_API_CHANNEL', '-1002076903232'))
 QR_CODE = environ.get('QR_CODE', 'https://envs.sh/YdS.jpg')
