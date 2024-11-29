@@ -38,7 +38,7 @@ BIN_CHANNEL = int(environ.get('BIN_CHANNEL', '-1001834715749'))
 URL = environ.get('URL', 'https://166.0.242.207:12731/')
 
 # verify system vars
-IS_VERIFY = is_enabled('IS_VERIFY', True)
+IS_VERIFY = is_enabled('IS_VERIFY', False)
 LOG_VR_CHANNEL = int(environ.get('LOG_VR_CHANNEL', '-1002076903232'))
 TUTORIAL = environ.get("TUTORIAL", "https://www.youtube.com/watch?v=iIzKydeJ9BM&pp=ygUaaG93IHRvIG9wZW4gc2hvcnRuZXIgbGluayA%3D")
 TUTORIAL2 = environ.get("TUTORIAL2", "https://www.youtube.com/watch?v=iIzKydeJ9BM&pp=ygUaaG93IHRvIG9wZW4gc2hvcnRuZXIgbGluayA%3D")
