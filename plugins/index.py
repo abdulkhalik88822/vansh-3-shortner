@@ -24,15 +24,15 @@ async def index_files(bot, query):
         await query.message.edit("Trying to cancel Indexing...")
 
 @Client.on_message(filters.command('index') & filters.private & filters.incoming & filters.user(ADMINS))
-async def send_for_index(bot, message):
+async def send_for_index(client, message):
     if lock.locked():
         return await message.reply('Wait until the previous process completes.')
 
     i = await message.reply("Forward the last message or send the last message link.")
 
     try:
-        # Use bot.wait_for() instead of get_chat_updates
-        msg = await bot.wait_for(filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
+        # Use client.wait_for() instead of bot.wait_for()
+        msg = await client.wait_for(filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
     except asyncio.TimeoutError:
         return await message.reply("You took too long to respond!")
 
@@ -56,7 +56,7 @@ async def send_for_index(bot, message):
         return
     
     try:
-        chat = await bot.get_chat(chat_id)
+        chat = await client.get_chat(chat_id)
     except Exception as e:
         return await message.reply(f'Error: {e}')
     
@@ -66,7 +66,7 @@ async def send_for_index(bot, message):
     s = await message.reply("Send skip message number.")
     
     try:
-        msg = await bot.wait_for(filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
+        msg = await client.wait_for(filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
     except asyncio.TimeoutError:
         return await message.reply("You took too long to respond!")
 
@@ -87,6 +87,7 @@ async def send_for_index(bot, message):
     ]
     reply_markup = InlineKeyboardMarkup(buttons)
     await message.reply(f'Do you want to index the channel "{chat.title}"?\nTotal Messages: <code>{last_msg_id}</code>', reply_markup=reply_markup)
+
 
 
 
