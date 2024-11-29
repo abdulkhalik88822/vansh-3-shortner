@@ -31,12 +31,9 @@ async def send_for_index(bot, message):
     
     i = await message.reply("Forward the last message or send the last message link.")
     
-    # Wait for the user's next message
-    def check(m):
-        return m.chat.id == message.chat.id and m.from_user.id == message.from_user.id
-
+    # Wait for the user's next message using wait_for_message
     try:
-        msg = await bot.listen(chat_id=message.chat.id, filters=filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
+        msg = await bot.wait_for_message(chat_id=message.chat.id, filters=filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
     except asyncio.TimeoutError:
         return await message.reply("You took too long to respond!")
 
@@ -70,7 +67,7 @@ async def send_for_index(bot, message):
     s = await message.reply("Send skip message number.")
     
     try:
-        msg = await bot.listen(chat_id=message.chat.id, filters=filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
+        msg = await bot.wait_for_message(chat_id=message.chat.id, filters=filters.text & filters.incoming & filters.user(message.from_user.id), timeout=60)
     except asyncio.TimeoutError:
         return await message.reply("You took too long to respond!")
 
