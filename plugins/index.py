@@ -135,6 +135,43 @@ async def set_skip_number(bot, message):
         await message.reply("Give me a skip number")
 
 
+async def save_files_in_bulk(messages):
+    total_files = 0
+    duplicate = 0
+    errors = 0
+    no_media = 0
+    unsupported = 0
+    
+    for message in messages:
+        if message.empty:
+            continue
+        elif not message.media:
+            no_media += 1
+            continue
+        elif message.media not in [enums.MessageMediaType.VIDEO, enums.MessageMediaType.AUDIO, enums.MessageMediaType.DOCUMENT]:
+            unsupported += 1
+            continue
+        
+        media = getattr(message, message.media.value, None)
+        if not media:
+            unsupported += 1
+            continue
+        
+        media.file_type = message.media.value
+        media.caption = message.caption
+        result = await save_file(media)
+        aynac, vnay = result[0], result[1]
+
+        if aynac:
+            total_files += 1
+        elif vnay == 0:
+            duplicate += 1
+        elif vnay == 2:
+            errors += 1
+
+    return total_files, duplicate, errors, no_media, unsupported
+
+# Fast indexing function using asyncio
 async def index_files_to_db(lst_msg_id, chat, msg, bot):
     total_files = 0
     duplicate = 0
@@ -142,49 +179,56 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
     deleted = 0
     no_media = 0
     unsupported = 0
+
     async with lock:
         try:
             current = temp.CURRENT
             temp.CANCEL = False
+            batch_size = 100  # Process 100 messages at a time
+
+            messages_to_process = []
+
             async for message in bot.iter_messages(chat, lst_msg_id, temp.CURRENT):
                 if temp.CANCEL:
-                    await msg.edit(f"Successfully Cancelled!!\n\nSaved <code>{total_files}</code> files to dataBase!\nDuplicate Files Skipped: <code>{duplicate}</code>\nDeleted Messages Skipped: <code>{deleted}</code>\nNon-Media messages skipped: <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\nErrors Occurred: <code>{errors}</code>")
+                    await msg.edit(f"Successfully Cancelled!!\n\nSaved <code>{total_files}</code> files to dataBase!")
                     break
                 current += 1
+
+                # Collect messages in batches
+                messages_to_process.append(message)
+
+                # When the batch is full, process it
+                if len(messages_to_process) >= batch_size:
+                    # Save files in bulk
+                    batch_results = await save_files_in_bulk(messages_to_process)
+                    total_files += batch_results[0]
+                    duplicate += batch_results[1]
+                    errors += batch_results[2]
+                    no_media += batch_results[3]
+                    unsupported += batch_results[4]
+                    
+                    # Clear the list after processing the batch
+                    messages_to_process = []
+
+                # Update progress every 20 messages
                 if current % 20 == 0:
                     can = [[InlineKeyboardButton('Cancel', callback_data='index_cancel')]]
                     reply = InlineKeyboardMarkup(can)
                     await msg.edit_text(
-                        text=f"Total messages fetched: <code>{current}</code>\nTotal messages saved: <code>{total_files}</code>\nDuplicate Files Skipped: <code>{duplicate}</code>\nDeleted Messages Skipped: <code>{deleted}</code>\nNon-Media messages skipped: <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\nErrors Occurred: <code>{errors}</code>",
+                        text=f"Total messages fetched: <code>{current}</code>\nTotal messages saved: <code>{total_files}</code>\nDuplicate Files Skipped: <code>{duplicate}</code>\nNon-Media messages skipped: <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\nErrors Occurred: <code>{errors}</code>",
                         reply_markup=reply)
-                if message.empty:
-                    deleted += 1
-                    continue
-                elif not message.media:
-                    no_media += 1
-                    continue
-                elif message.media not in [enums.MessageMediaType.VIDEO, enums.MessageMediaType.AUDIO, enums.MessageMediaType.DOCUMENT]:
-                    unsupported += 1
-                    continue
-                media = getattr(message, message.media.value, None)
-                if not media:
-                    unsupported += 1
-                    continue
-                media.file_type = message.media.value
-                media.caption = message.caption
-                result = await save_file(media)
-                aynac = result[0]  # Unpack the first value
-                vnay = result[1]   # Unpack the second value
-                # Optionally, unpack other values if needed
-                if aynac:
-                    total_files += 1
-                elif vnay == 0:
-                    duplicate += 1
-                elif vnay == 2:
-                    errors += 1
+            
+            # Process any remaining messages if they don't fill the final batch
+            if messages_to_process:
+                batch_results = await save_files_in_bulk(messages_to_process)
+                total_files += batch_results[0]
+                duplicate += batch_results[1]
+                errors += batch_results[2]
+                no_media += batch_results[3]
+                unsupported += batch_results[4]
+            
         except Exception as e:
             logger.exception(e)
             await msg.edit(f'Error: {e}')
         else:
-            await msg.edit(f'Succesfully saved <code>{total_files}</code> to dataBase!\nDuplicate Files Skipped: <code>{duplicate}</code>\nDeleted Messages Skipped: <code>{deleted}</code>\nNon-Media messages skipped: <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\nErrors Occurred: <code>{errors}</code>')
-
+            await msg.edit(f'Successfully saved <code>{total_files}</code> files to dataBase!\nDuplicate Files Skipped: <code>{duplicate}</code>\nNon-Media messages skipped: <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\nErrors Occurred: <code>{errors}</code>')
